@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SweettouchbyMJ | Sistem Pengurusan (Cloud)</title>
+<style>
+:root{--pink:#d98fa7;--pink2:#f8e8ee;--rose:#a95d78;--ink:#352b30;--muted:#82757b;--line:#eee3e7;--bg:#fbf8f9;--white:#fff;--green:#37866a;--amber:#b7791f;--red:#b94b5b;--shadow:0 8px 28px #5830440c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,Segoe UI,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{display:flex;min-height:100vh}
+.sidebar{width:245px;background:#fff;border-right:1px solid var(--line);padding:24px 16px;position:fixed;inset:0 auto 0 0;z-index:5;display:flex;flex-direction:column}
+.brand{padding:3px 12px 24px}
+.brand strong{display:block;letter-spacing:1.3px;font-size:17px;color:var(--rose)}
+.brand span{font-size:11px;color:var(--muted);letter-spacing:1.8px}
+.nav-label{font-size:10px;color:#aa9ca2;font-weight:700;letter-spacing:1.5px;padding:12px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;padding:11px 12px;border-radius:10px;text-align:left;color:#756970;margin:2px 0}
+.nav button.active,.nav button:hover{background:var(--pink2);color:var(--rose);font-weight:650}
+.nav .ico{width:20px;text-align:center;font-size:16px}
+.side-bottom{margin-top:auto;padding:12px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+main{margin-left:245px;width:calc(100% - 245px);padding:28px 34px 50px;max-width:1600px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px;gap:16px}
+.eyebrow{font-size:11px;letter-spacing:1.5px;color:var(--rose);font-weight:700;text-transform:uppercase}
+.top h1{font-size:25px;margin:3px 0 0;letter-spacing:-.5px}
+.top-right{display:flex;align-items:center;gap:10px}
+.date-chip,.user-chip{background:#fff;border:1px solid var(--line);padding:9px 13px;border-radius:10px;color:var(--muted);font-size:12px}
+.user-chip{color:var(--rose);font-weight:650}
+.page{display:none}
+.page.active{display:block}
+.welcome{background:linear-gradient(110deg,#f8e8ee,#fff7f9);border:1px solid #f2dce4;border-radius:16px;padding:22px 24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;gap:18px}
+.welcome h2{font-size:20px;margin:0 0 5px}
+.welcome p{margin:0;color:#806d76}
+.welcome-mark{font-size:38px;opacity:.75}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:20px}
+.stat,.panel,.card{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow)}
+.stat{padding:17px}
+.stat-top{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.stat-icon{background:var(--pink2);color:var(--rose);border-radius:9px;padding:7px}
+.stat strong{display:block;font-size:25px;margin:8px 0 0}
+.stat small{color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:16px}
+.panel{padding:18px;margin-bottom:16px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:13px}
+.panel h3{margin:0;font-size:15px}
+.muted{color:var(--muted)}
+.small{font-size:11px}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 12px;color:#665860;font-weight:600;display:inline-block;}
+.btn:hover{border-color:var(--pink);color:var(--rose)}
+.btn.primary{background:var(--rose);color:#fff;border-color:var(--rose)}
+.btn.soft{background:var(--pink2);color:var(--rose);border-color:#f1d9e2}
+.btn.danger{color:var(--red);border-color:#f2d9dd}
+.btn-row{display:flex;gap:8px;flex-wrap:wrap}
+.table-wrap{overflow:auto}
+table{width:100%;border-collapse:collapse;white-space:nowrap}
+th{text-align:left;color:#988990;font-size:10px;text-transform:uppercase;letter-spacing:1px;font-weight:700;padding:10px 9px;border-bottom:1px solid var(--line)}
+td{padding:12px 9px;border-bottom:1px solid #f5eff1;font-size:12px}
+tr:last-child td{border-bottom:0}
+.pill{display:inline-flex;padding:4px 8px;border-radius:20px;font-size:10px;font-weight:700;background:#f4f0f2;color:#756970}
+.pill.green{background:#e7f4ee;color:#287653}
+.pill.amber{background:#fff3dc;color:#986414}
+.pill.red{background:#fbe9ec;color:#ad4354}
+.pill.pink{background:var(--pink2);color:var(--rose)}
+.empty{text-align:center;color:var(--muted);padding:28px!important}
+.reminder{display:flex;gap:11px;padding:12px 0;border-bottom:1px solid #f3ecef}
+.reminder:last-child{border:0}
+.reminder-date{min-width:48px;height:48px;background:var(--pink2);color:var(--rose);border-radius:10px;display:grid;place-items:center;font-weight:750}
+.reminder b{font-size:12px}
+.reminder p{margin:2px 0;color:var(--muted);font-size:11px}
+.toolbar{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+.search{min-width:220px;max-width:340px;width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 11px;background:#fff;outline:none}
+.search:focus,input:focus,select:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px #d98fa71c;outline:none}
+.filters{display:flex;gap:8px;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field label{font-size:11px;color:#766970;font-weight:700}
+.field input,.field select,.field textarea{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.field textarea{min-height:70px;resize:vertical}
+
+/* KAD JADUAL MINGGUAN KHAS DALAM TAB KALENDAR - ALTERNATE COLORS */
+.week-card { border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 18px; box-shadow: var(--shadow); }
+.week-card.alt-bg-0 { background: #ffffff; }
+.week-card.alt-bg-1 { background: #fdf6f8; border-color: #f3dce3; }
+.week-card-header { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--pink2); padding-bottom: 12px; margin-bottom: 14px; gap:12px; flex-wrap:wrap; }
+.week-card-header h4 { margin: 0; font-size: 16px; color: var(--rose); }
+.tray-badge-pill { background: var(--rose); color: #fff; font-weight: 700; padding: 6px 14px; border-radius: 20px; font-size: 12px; text-align: right; }
+.tray-badge-breakdown { font-size: 11px; font-weight: 500; color: #fce8ee; display: block; margin-top: 2px; }
+
+input[type="date"], input[type="time"] { display: block !important; appearance: auto !important; -webkit-appearance: auto !important; cursor: pointer; }
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+.form-grid .full{grid-column:1/-1}
+.modal-back{position:fixed;inset:0;background:#25182066;z-index:20;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-back.show{display:flex}
+.modal{background:#fff;border-radius:16px;width:min(680px,100%);max-height:90vh;overflow:auto;padding:22px;box-shadow:0 20px 60px #25182033}
+.modal h2{font-size:18px;margin:0 0 16px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.item-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.item-card{border:1px solid var(--line);border-radius:12px;padding:13px}
+.item-card h4{margin:0 0 4px;font-size:13px}
+.item-card p{margin:0;color:var(--muted);font-size:11px}
+.bar{height:8px;background:#f5edf0;border-radius:10px;overflow:hidden;margin-top:9px}
+.bar span{display:block;height:100%;background:var(--pink);border-radius:10px}
+.notice{background:#fff8e9;border:1px solid #f5e8c7;color:#85621d;padding:11px 13px;border-radius:10px;font-size:11px;margin-bottom:14px}
+.link-button{color:var(--rose);text-decoration:none;font-weight:700}
+.checkbox-list{max-height:260px;overflow-y:auto;border:1px solid var(--line);padding:10px;border-radius:8px;background:#fbf8f9}
+.time-range{display:flex;gap:8px;align-items:center}
+#loginOverlay {position:fixed;inset:0;background:var(--bg);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;}
+#loginBox {background:#fff;border:1px solid var(--line);border-radius:16px;padding:32px;width:min(400px, 100%);box-shadow:var(--shadow);text-align:center;}
+#loginBox h2 {color:var(--rose);margin-top:0;}
+@media print {
+  body * { visibility: hidden; }
+  #printArea, #printArea * { visibility: visible; }
+  #printArea { position: absolute; left: 0; top: 0; width: 100%; }
+}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import { getFirestore, collection, getDocs, setDoc, doc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3-SOE5IE7jPZqB8zA2BJW9En8W5waxgg",
+    authDomain: "sweettouchbymj.firebaseapp.com",
+    projectId: "sweettouchbymj",
+    storageBucket: "sweettouchbymj.firebasestorage.app",
+    messagingSenderId: "804551682739",
+    appId: "1:804551682739:web:de106cc44b9af0c8095ec6",
+    measurementId: "G-8PZS1HPL7K"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.FB = { auth, db, signInWithEmailAndPassword, onAuthStateChanged, signOut, collection, getDocs, setDoc, doc, deleteDoc, onSnapshot };
+</script>
+</head>
+<body>
+
+<div id="loginOverlay">
+ <div id="loginBox">
+  <h2>SWEETTOUCHBYMJ</h2>
+  <p class="small muted" style="margin-bottom:20px">Sistem Pengurusan Dalaman (Cloud)</p>
+  <div class="field"><label>Emel Admin / Pekerja</label><input type="email" id="loginEmail" placeholder="nama@gmail.com"></div>
+  <div class="field"><label>Kata Laluan</label><input type="password" id="loginPass" placeholder="••••••••"></div>
+  <button class="btn primary" style="width:100%;margin-top:10px;" onclick="handleLogin()">Log Masuk Sistem</button>
+  <div id="loginError" class="small" style="color:var(--red);margin-top:10px;"></div>
+ </div>
+</div>
+
+<div class="app">
+<aside class="sidebar">
+ <div class="brand"><strong>SWEETTOUCHBYMJ</strong><span>CLOUD SYSTEM</span></div>
+ <div class="nav-label">MENU UTAMA</div>
+ <nav class="nav">
+  <button class="active" data-page="dashboard"><span class="ico">⌂</span><span class="nav-text">Dashboard</span></button>
+  <button data-page="calendar"><span class="ico">📅</span><span class="nav-text">Kalendar / Mingguan</span></button>
+  <button data-page="bookings"><span class="ico">▣</span><span class="nav-text">Tempahan</span></button>
+  <button data-page="customers"><span class="ico">♙</span><span class="nav-text">Pelanggan</span></button>
+  <button data-page="inventory"><span class="ico">▤</span><span class="nav-text">Inventori</span></button>
+  <button data-page="payments"><span class="ico">＄</span><span class="nav-text">Bayaran</span></button>
+  <button data-page="appointments"><span class="ico">📝</span><span class="nav-text">Temu Janji Walk-In</span></button>
+  <button data-page="staff"><span class="ico">👥</span><span class="nav-text">Kakitangan & Gaji</span></button>
+  <button data-page="reports"><span class="ico">▥</span><span class="nav-text">Laporan</span></button>
+ </nav>
+ <div class="nav-label">TETAPAN</div>
+ <nav class="nav">
+  <button data-page="settings"><span class="ico">⚙</span><span class="nav-text">Tetapan</span></button>
+ </nav>
+ <div class="side-bottom"><span id="userEmailLabel"></span><br><a href="#" onclick="handleLogout()" style="color:var(--rose)">Log Keluar</a></div>
+</aside>
+<main>
+ <header class="top">
+  <div><div class="eyebrow">Sistem Cloud Terkini</div><h1 id="pageTitle">Dashboard</h1></div>
+  <div class="top-right"><div class="date-chip" id="todayLabel"></div><div class="user-chip">Cloud Live Sync 🟢</div></div>
+ </header>
+
+ <section class="page active" id="page-dashboard">
+  <div class="welcome"><div><div class="eyebrow">Selamat datang</div><h2>Urus tempahan dengan pangkalan data awan 🌸</h2><p>Data dikongsi serentak di antara telefon dan laptop anda.</p></div><div class="welcome-mark">✿</div></div>
+  <div class="notice">
+    <b>📌 NOTA OPERASI & WAKTU REHAT:</b><br>
+    • Waktu rehat premis: <b>12.30 PM – 2.00 PM</b>.<br>
+    • SweettouchbyMJ bercuti setiap <b>Sabtu, Ahad, dan Cuti Umum</b>.<br>
+    • <b>Hari Sabtu:</b> Hanya <i>self drop</i>. Hubungi admin sebelum berurusan (Cara masuk pagar akan dimaklumkan).
+  </div>
+  <div class="stats">
+   <div class="stat"><div class="stat-top"><span>Tempahan Aktif</span><span class="stat-icon">▣</span></div><strong id="statActive">0</strong><small>Belum selesai</small></div>
+   <div class="stat"><div class="stat-top"><span>Baki Belum Bayar</span><span class="stat-icon">◷</span></div><strong id="statBalance">RM0.00</strong><small>Dari pelanggan</small></div>
+   <div class="stat"><div class="stat-top"><span>Terimaan (Bulan Ini)</span><span class="stat-icon">＄</span></div><strong id="statPaidMonth">RM0.00</strong><small id="labelMonth">Bulan semasa</small></div>
+   <div class="stat"><div class="stat-top"><span>Terimaan (Tahun Ini)</span><span class="stat-icon">＄</span></div><strong id="statPaidYear">RM0.00</strong><small id="labelYear">Tahun semasa</small></div>
+  </div>
+
+  <div class="grid2">
+   <div class="panel"><div class="panel-head"><h3>Tempahan terkini</h3><button class="btn soft" onclick="showPage('bookings')">Lihat semua</button></div><div class="table-wrap"><table><thead><tr><th>Rujukan</th><th>Pelanggan</th><th>Tarikh Majlis</th><th>Status</th></tr></thead><tbody id="recentBookings"></tbody></table></div></div>
+   <div class="panel"><div class="panel-head"><h3>Peringatan 14 hari</h3><span class="pill pink">Perlu tindakan</span></div><div id="reminderList"></div><div class="small muted" style="margin-top:10px">Peringatan berdasarkan tarikh majlis (termasuk Hari, Tarikh & Masa).</div></div>
+  </div>
+  <div class="panel"><div class="panel-head"><h3>Pautan pantas</h3></div><div class="btn-row"><button class="btn primary" onclick="openBooking()">＋ Tempahan baharu</button><button class="btn" onclick="openQuickBookingLink()">🔗 Pautan Quick Booking (Public)</button><button class="btn" onclick="openCustomer()">＋ Pelanggan baharu</button><button class="btn" onclick="showPage('appointments')">📅 Rekod Walk-In</button></div></div>
+ </section>
+
+ <section class="page" id="page-calendar">
+  <div class="toolbar">
+    <div>
+      <div class="eyebrow">Jadual Kerja & Gubahan</div>
+      <h2 style="margin:2px 0;font-size:20px">Kalendar Mingguan Dulang</h2>
+      <div class="small muted">Disatukan mengikut tarikh majlis, berserta pecahan kuantiti per jenis dulang dan warna kad selang-seli.</div>
+    </div>
+  </div>
+  
+  <div id="weeklyCalendarList"></div>
+ </section>
+
+ <section class="page" id="page-bookings">
+  <div class="toolbar"><div><div class="eyebrow">Pengurusan</div><h2 style="margin:2px 0;font-size:20px">Rekod tempahan</h2><div class="small muted">Data disimpan selamat di Cloud Firestore.</div></div><div class="btn-row"><button class="btn soft" onclick="openQuickBookingLink()">🔗 Form WhatsApp Client</button><button class="btn primary" onclick="openBooking()">＋ Tambah tempahan</button></div></div>
+  <div class="panel">
+   <div class="toolbar"><input class="search" id="bookingSearch" placeholder="Cari rujukan, nama atau telefon..." oninput="renderBookings()"><div class="filters"><select id="bookingFilter" class="btn" onchange="renderBookings()"><option value="">Semua status</option><option>Baru</option><option>Disahkan</option><option>Sedang disewa</option><option>Selesai</option><option>Batal</option></select></div></div>
+   <div class="table-wrap"><table><thead><tr><th>Rujukan</th><th>Pelanggan</th><th>Telefon</th><th>Majlis (Hari & Julat Tarikh)</th><th>Jumlah</th><th>Baki</th><th>Status</th><th>Tindakan</th></tr></thead><tbody id="bookingRows"></tbody></table></div>
+  </div>
+ </section>
+
+ <section class="page" id="page-customers">
+  <div class="toolbar"><div><div class="eyebrow">Direktori</div><h2 style="margin:2px 0;font-size:20px">Pelanggan</h2><div class="small muted">Satu pelanggan boleh mempunyai beberapa tempahan.</div></div><button class="btn primary" onclick="openCustomer()">＋ Tambah pelanggan</button></div>
+  <div class="panel"><input class="search" id="customerSearch" placeholder="Cari nama, WhatsApp username atau telefon..." oninput="renderCustomers()"><div class="table-wrap" style="margin-top:14px"><table><thead><tr><th>Nama</th><th>Telefon</th><th>WhatsApp User</th><th>Jumlah tempahan</th><th>Jumlah belian</th><th>Catatan</th><th></th></tr></thead><tbody id="customerRows"></tbody></table></div></div>
+ </section>
+
+ <section class="page" id="page-inventory">
+  <div class="toolbar"><div><div class="eyebrow">Stok & aset</div><h2 style="margin:2px 0;font-size:20px">Inventori (Auto-Kuantiti)</h2><div class="small muted">Stok kuantiti per kategori + baki fizikal.</div></div><div class="btn-row"><button class="btn" onclick="openCategory()">＋ Kategori</button><button class="btn primary" onclick="openItem()">＋ Item / dulang</button></div></div>
+  <div class="notice">Status item dikemas kini secara automatik mengikut semakan julat tarikh tempahan di Cloud.</div>
+  <div class="panel"><div class="panel-head"><h3>Ringkasan kategori & kuantiti stok</h3></div><div class="item-grid" id="categoryCards"></div></div>
+  <div class="panel"><div class="panel-head"><h3>Senarai item individu</h3><input class="search" id="itemSearch" style="max-width:260px" placeholder="Cari kod atau kategori..." oninput="renderInventory()"></div><div class="table-wrap"><table><thead><tr><th>ID item</th><th>Kategori</th><th>Nama / keterangan</th><th>Status Semasa</th><th></th></tr></thead><tbody id="itemRows"></tbody></table></div></div>
+ </section>
+
+ <section class="page" id="page-payments">
+  <div class="toolbar"><div><div class="eyebrow">Kewangan</div><h2 style="margin:2px 0;font-size:20px">Bayaran</h2><div class="small muted">Rekod deposit, bayaran tambahan dan baki akhir.</div></div><button class="btn primary" onclick="openPayment()">＋ Rekod bayaran</button></div>
+  <div class="stats" style="grid-template-columns:repeat(3,1fr)"><div class="stat"><div class="stat-top">Jumlah diterima (All Time)</div><strong id="payReceived">RM0.00</strong></div><div class="stat"><div class="stat-top">Baki belum diterima</div><strong id="payOutstanding">RM0.00</strong></div><div class="stat"><div class="stat-top">Bilangan transaksi</div><strong id="payCount">0</strong></div></div>
+  <div class="panel"><div class="toolbar"><input class="search" id="paymentSearch" placeholder="Cari rujukan / pelanggan..." oninput="renderPayments()"></div><div class="table-wrap"><table><thead><tr><th>Tarikh</th><th>Rujukan</th><th>Pelanggan</th><th>Kaedah</th><th>Jenis</th><th>Jumlah</th></tr></thead><tbody id="paymentRows"></tbody></table></div></div>
+ </section>
+
+ <section class="page" id="page-appointments">
+  <div class="toolbar"><div><div class="eyebrow">Operasi Premis</div><h2 style="margin:2px 0;font-size:20px">Temu Janji Walk-In (Sabtu Minggu 1)</h2><div class="small muted">Slot kehadiran khusus Sabtu minggu pertama (9:00 AM – 2:00 PM).</div></div><button class="btn primary" onclick="openAppointmentModal()">＋ Rekod Temu Janji</button></div>
+  <div class="notice"><b>📌 PERATURAN TEMU JANJI:</b> Sistem hanya membenarkan tempahan walk-in pada <b>Hari Sabtu Minggu Pertama Setiap Bulan</b> dari <b>9:00 AM hingga 2:00 PM</b> sahaja.</div>
+  <div class="panel"><div class="table-wrap"><table><thead><tr><th>Tarikh Sabtu</th><th>Masa Slot</th><th>Nama Pelanggan</th><th>Telefon</th><th>Tujuan / Catatan</th><th>Tindakan</th></tr></thead><tbody id="appointmentRows"></tbody></table></div></div>
+ </section>
+
+ <section class="page" id="page-staff">
+  <div class="toolbar"><div><div class="eyebrow">Pengurusan Sumber Manusia</div><h2 style="margin:2px 0;font-size:20px">Kakitangan & Kehadiran (Clock-In)</h2><div class="small muted">Pengesahan ID unik, GPS lokasi terbuka & pengiraan payroll jam.</div></div><div class="btn-row"><button class="btn soft" onclick="openClockInModal()">⏱ Clock-In / Clock-Out Staf</button><button class="btn primary" onclick="openStaffModal()">＋ Tambah Staf</button></div></div>
+  <div class="panel"><div class="panel-head"><h3>Direktori Kakitangan (Admin)</h3></div><div class="table-wrap"><table><thead><tr><th>ID Unik</th><th>Nama Staf</th><th>Telefon</th><th>Kadar Gaji (/Jam)</th><th>Tindakan</th></tr></thead><tbody id="staffRows"></tbody></table></div></div>
+  <div class="panel"><div class="panel-head"><h3>Rekod Kehadiran & Pengiraan Payroll</h3></div><div class="table-wrap"><table><thead><tr><th>Tarikh</th><th>Nama Staf</th><th>Masuk</th><th>Keluar</th><th>Jumlah Jam</th><th>Anggaran Gaji</th><th>Lokasi GPS Check-in</th></tr></thead><tbody id="attendanceRows"></tbody></table></div></div>
+ </section>
+
+ <section class="page" id="page-reports">
+  <div class="toolbar"><div><div class="eyebrow">Analisis Business</div><h2 style="margin:2px 0;font-size:20px">Laporan Hasil & Kategori</h2><div class="small muted">Ringkasan kewangan dan pecahan hasil kategori dulang.</div></div><button class="btn" onclick="exportCSV()">↓ Eksport CSV tempahan</button></div>
+  <div class="stats"><div class="stat"><div class="stat-top">Jumlah Jualan (All Time)</div><strong id="reportSales">RM0</strong></div><div class="stat"><div class="stat-top">Bayaran diterima</div><strong id="reportPaid">RM0</strong></div><div class="stat"><div class="stat-top">Baki tertunggak</div><strong id="reportDue">RM0</strong></div><div class="stat"><div class="stat-top">Tempahan selesai</div><strong id="reportDone">0</strong></div></div>
+  <div class="panel"><div class="panel-head"><h3>Pecahan Hasil Mengikut Kategori Dulang / Produk</h3></div><div id="categoryRevenueReport"></div></div>
+  <div class="panel"><div class="panel-head"><h3>Tempahan mengikut status</h3></div><div id="statusReport"></div></div>
+  <div class="panel"><div class="panel-head"><h3>Sandaran data</h3></div><p class="small muted">Data tersimpan selamat di pelayan Cloud Google Firebase.</p><div class="btn-row"><button class="btn primary" onclick="backupData()">Muat turun sandaran JSON</button></div></div>
+ </section>
+
+ <section class="page" id="page-settings">
+  <div class="eyebrow">Konfigurasi</div><h2 style="margin:2px 0 16px;font-size:20px">Tetapan sistem</h2>
+  <div class="panel" style="max-width:650px"><h3>Pautan WhatsApp Catalogue</h3><p class="small muted">Sistem dalaman hanya memaparkan butang pautan ke katalog WhatsApp sedia ada.</p><div class="field"><label>URL katalog WhatsApp</label><input id="catalogUrl" placeholder="https://wa.me/c/..."></div><button class="btn primary" onclick="saveSettings()">Simpan pautan</button> <a id="catalogLink" class="link-button" href="#" target="_blank" rel="noopener" style="margin-left:10px">Buka WhatsApp Catalogue ↗</a></div>
+  <div class="panel" style="max-width:650px"><h3>Maklumat premis / pickup</h3><p class="small muted">Alamat ini akan dimasukkan ke dalam draf mesej WhatsApp untuk pelanggan.</p><div class="field"><label>Alamat premis SweettouchbyMJ</label><textarea id="businessAddress" placeholder="Masukkan alamat premis SweettouchbyMJ di Taman Rapat Permai, Ipoh"></textarea></div><button class="btn primary" onclick="saveSettings()">Simpan tetapan</button></div>
+ </section>
+</main>
+</div>
+
+<div class="modal-back" id="modalBack" onclick="if(event.target===this)closeModal()">
+ <div class="modal">
+  <div class="panel-head"><h2 id="modalTitle">Borang</h2><button class="btn" onclick="closeModal()">✕</button></div>
+  <div id="modalBody"></div>
+  <div class="modal-actions" id="modalActions"></div>
+ </div>
+</div>
+
+<div id="printArea"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const val = id => $(id).value.trim();
+const money = n => 'RM' + Number(n || 0).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const today = () => new Date().toISOString().slice(0, 10);
+const currentMonth = () => new Date().toISOString().slice(0, 7);
+const currentYear = () => new Date().toISOString().slice(0, 4);
+const escapeHTML = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const formatDayDate = (dateStr) => {
+  if (!dateStr) return '—';
+  let d = new Date(dateStr + 'T00:00:00');
+  return d.toLocaleDateString('ms-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+const timeFmt = t => {
+  if(!t) return '';
+  let [h, m] = t.split(':');
+  let ampm = h >= 12 ? 'PM' : 'AM';
+  h = h % 12 || 12;
+  return `${h}:${m} ${ampm}`;
+};
+
+let dbCache = { customers: [], bookings: [], payments: [], categories: [], items: [], appointments: [], staff: [], attendance: [], settings: { catalogUrl: '', businessAddress: '' } };
+
+window.addEventListener('DOMContentLoaded', () => {
+  const checkFB = setInterval(() => {
+    if (window.FB) {
+      clearInterval(checkFB);
+      initCloudAuth();
+    }
+  }, 200);
+});
+
+function initCloudAuth() {
+  const { auth, onAuthStateChanged } = window.FB;
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      $('loginOverlay').style.display = 'none';
+      $('userEmailLabel').textContent = user.email;
+      startCloudSync();
+    } else {
+      $('loginOverlay').style.display = 'flex';
+    }
+  });
+}
+
+async function handleLogin() {
+  const email = val('loginEmail'), pass = val('loginPass');
+  const { auth, signInWithEmailAndPassword } = window.FB;
+  try {
+    $('loginError').textContent = '';
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (err) {
+    $('loginError').textContent = 'Log masuk gagal. Sila semak emel & kata laluan.';
+  }
+}
+
+async function handleLogout() {
+  const { auth, signOut } = window.FB;
+  await signOut(auth);
+}
+
+function startCloudSync() {
+  const { db, collection, onSnapshot, doc } = window.FB;
+  
+  onSnapshot(collection(db, 'customers'), snap => { dbCache.customers = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(collection(db, 'bookings'), snap => { dbCache.bookings = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(collection(db, 'payments'), snap => { dbCache.payments = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(collection(db, 'items'), async snap => {
+    dbCache.items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (dbCache.items.length === 0) await forceSeedInventory();
+    renderAll();
+  });
+  onSnapshot(collection(db, 'categories'), async snap => {
+    dbCache.categories = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (dbCache.categories.length === 0) await forceSeedCategories();
+    renderAll();
+  });
+  onSnapshot(collection(db, 'appointments'), snap => { dbCache.appointments = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(collection(db, 'staff'), snap => { dbCache.staff = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(collection(db, 'attendance'), snap => { dbCache.attendance = snap.docs.map(d => ({ id: d.id, ...d.data() })); renderAll(); });
+  onSnapshot(doc(db, 'config', 'settings'), snap => { if (snap.exists()) dbCache.settings = snap.data(); loadSettings(); });
+}
+
+async function forceSeedCategories() {
+  const { db, setDoc, doc } = window.FB;
+  const cats = [
+    { id: 'CAT-01', name: 'Dulang Hitam (RM30)' },
+    { id: 'CAT-02', name: 'Dulang Rose Gold Ukir (RM30)' },
+    { id: 'CAT-03', name: 'Dulang Silver Tapak Besar (RM30)' },
+    { id: 'CAT-04', name: 'Dulang Kayu (RM30)' },
+    { id: 'CAT-05', name: 'Dulang Mutiara Premium (RM35)' },
+    { id: 'CAT-06', name: 'Dulang Diamond Premium (RM35)' },
+    { id: 'CAT-07', name: 'Welcome Board' }
+  ];
+  for (let c of cats) await setDoc(doc(db, 'categories', c.id), c);
+}
+
+async function forceSeedInventory() {
+  const { db, setDoc, doc } = window.FB;
+  const generateStok = async (c, p, q, d) => {
+    for(let i=1; i<=q; i++) {
+      let id = `IT-${c}-${i}`;
+      await setDoc(doc(db, 'items', id), { code: `${p}-${String(i).padStart(2,'0')}`, categoryId: c, description: d, status: 'Available' });
+    }
+  };
+  await generateStok('CAT-01', 'DH', 24, 'RM30 (Promo: 7=RM200, 9=RM255)');
+  await generateStok('CAT-02', 'DRG', 32, 'RM30 (Promo: 7=RM200, 9=RM255)');
+  await generateStok('CAT-03', 'DS', 10, 'RM30 (Promo: 7=RM200, 9=RM255)');
+  await generateStok('CAT-04', 'DK', 17, 'RM30 (Promo: 7=RM200, 9=RM255)');
+  await generateStok('CAT-05', 'DM', 10, 'RM35 (Promo: 7=RM235, 9=RM300)');
+  await generateStok('CAT-06', 'DP', 10, 'RM35 (Promo: 7=RM235, 9=RM300)');
+  await setDoc(doc(db, 'items', 'IT-CAT-07-1'), { code: 'WB-FOAM-01', categoryId: 'CAT-07', description: 'Welcome Board Jenis Foam (RM65)', status: 'Available' });
+  await setDoc(doc(db, 'items', 'IT-CAT-07-2'), { code: 'WB-CERMIN-01', categoryId: 'CAT-07', description: 'Welcome Board Jenis Cermin (RM75)', status: 'Available' });
+}
+
+async function saveToCloud(collectionName, id, data) {
+  const { db, setDoc, doc } = window.FB;
+  await setDoc(doc(db, collectionName, id), data);
+}
+
+function showPage(p) {
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  $('page-' + p).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('active', x.dataset.page === p));
+  const titles = { dashboard: 'Dashboard', calendar: 'Kalendar Mingguan Dulang', bookings: 'Tempahan', customers: 'Pelanggan', inventory: 'Inventori', payments: 'Bayaran', appointments: 'Temu Janji Walk-In', staff: 'Kakitangan & Gaji', reports: 'Laporan', settings: 'Tetapan' };
+  $('pageTitle').textContent = titles[p];
+  if (p === 'settings') loadSettings();
+  renderAll();
+}
+document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => showPage(b.dataset.page)));
+
+function customerName(id) { return dbCache.customers.find(c => c.id === id)?.name || 'Pelanggan tidak ditemui'; }
+function bookingPaid(b) { return dbCache.payments.filter(p => p.bookingId === b.id).reduce((s, p) => s + Number(p.amount), 0); }
+function bookingBalance(b) { 
+  let total = Number(b.total || 0);
+  let disc = Number(b.discount || 0);
+  let dep = Number(b.deposit || 0);
+  let paidTotal = bookingPaid(b);
+  return Math.max(0, total - disc - dep - paidTotal);
+}
+function statusPill(s) {
+  let cl = ({'Disahkan': 'green', 'Selesai': 'green', 'Sedang disewa': 'pink', 'Baru': 'amber', 'Batal': 'red', 'Available': 'green', 'Returned': 'green', 'Reserved': 'amber', 'Rented': 'pink', 'Maintenance': 'red'})[s] || '';
+  return `<span class="pill ${cl}">${escapeHTML(s || '—')}</span>`;
+}
+
+function renderAll() {
+  renderDashboard(); renderWeeklyCalendar(); renderBookings(); renderCustomers(); renderInventory(); renderPayments(); renderAppointments(); renderStaff(); renderReports();
+}
+
+function renderDashboard() {
+  const active = dbCache.bookings.filter(b => !['Selesai', 'Batal'].includes(b.status)).length;
+  const due = dbCache.bookings.reduce((s, b) => s + bookingBalance(b), 0);
+  const pMonth = dbCache.payments.filter(p => p.date.startsWith(currentMonth())).reduce((s, p) => s + Number(p.amount), 0);
+  const pYear = dbCache.payments.filter(p => p.date.startsWith(currentYear())).reduce((s, p) => s + Number(p.amount), 0);
+  
+  $('statActive').textContent = active; $('statBalance').textContent = money(due);
+  $('statPaidMonth').textContent = money(pMonth); $('statPaidYear').textContent = money(pYear);
+  
+  let monthName = new Date().toLocaleString('ms-MY', { month: 'long' });
+  $('labelMonth').textContent = monthName + " " + currentYear();
+  $('labelYear').textContent = "Tahun " + currentYear();
+
+  const latest = [...dbCache.bookings].sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || '')).slice(0, 5);
+  $('recentBookings').innerHTML = latest.length ? latest.map(b => `<tr><td><b>${escapeHTML(b.ref)}</b></td><td>${escapeHTML(customerName(b.customerId))}</td><td>${formatDayDate(b.eventStart || b.eventDate)}</td><td>${statusPill(b.status)}</td></tr>`).join('') : `<tr><td colspan="4" class="empty">Belum ada tempahan.</td></tr>`;
+  
+  const reminders = dbCache.bookings.filter(b => (b.eventStart || b.eventDate) && b.reminderStatus !== 'Selesai' && b.status !== 'Batal').map(b => ({ ...b, days: Math.ceil((new Date((b.eventStart || b.eventDate) + 'T00:00:00') - new Date(today() + 'T00:00:00')) / 86400000) })).filter(b => b.days >= 0 && b.days <= 14).sort((a, b) => a.days - b.days);
+  $('reminderList').innerHTML = reminders.length ? reminders.map(b => `<div class="reminder"><div class="reminder-date">${b.days === 0 ? 'Hari ini' : b.days + ' hari'}</div><div><b>${escapeHTML(b.ref)} · ${escapeHTML(customerName(b.customerId))}</b><p>Majlis: ${formatDayDate(b.eventStart || b.eventDate)} · ${escapeHTML(b.reminderStatus || 'Belum dihubungi')}</p><button class="btn soft" style="padding:5px 8px;margin-top:4px" onclick="openReminder('${b.id}')">Urus peringatan</button></div></div>`).join('') : `<div class="empty">Tiada peringatan.</div>`;
+}
+
+function renderWeeklyCalendar() {
+  const container = $('weeklyCalendarList');
+  if (!container) return;
+
+  const validBookings = dbCache.bookings.filter(b => b.status !== 'Batal').sort((a, b) => (a.eventStart || a.eventDate || '').localeCompare(b.eventStart || b.eventDate || ''));
+
+  if (validBookings.length === 0) {
+    container.innerHTML = `<div class="panel empty">Tiada rekod tempahan aktif untuk dipaparkan dalam kalendar.</div>`;
+    return;
+  }
+
+  const grouped = {};
+  validBookings.forEach(b => {
+    let dateStr = formatDayDate(b.eventStart || b.eventDate);
+    if (b.eventEnd && b.eventEnd !== (b.eventStart || b.eventDate)) {
+      dateStr += ` hingga ${formatDayDate(b.eventEnd)}`;
+    }
+    if (!grouped[dateStr]) grouped[dateStr] = [];
+    grouped[dateStr].push(b);
+  });
+
+  let html = '';
+  let groupIndex = 0;
+
+  Object.entries(grouped).forEach(([dateStr, bookings]) => {
+    let grandTotalTrays = 0;
+    let categoryTotals = {};
+
+    bookings.forEach(b => {
+      let bCount = 0;
+      if (b.categoryCounts) {
+        Object.entries(b.categoryCounts).forEach(([catId, qty]) => {
+          let cat = dbCache.categories.find(c => c.id === catId);
+          let q = Number(qty || 0);
+          if (cat && q > 0) {
+            let catCleanName = cat.name.replace(/\(RM\d+\)/g, '').trim();
+            categoryTotals[catCleanName] = (categoryTotals[catCleanName] || 0) + q;
+            bCount += q;
+          }
+        });
+      }
+      grandTotalTrays += (bCount > 0 ? bCount : 7);
+    });
+
+    let breakdownArr = Object.entries(categoryTotals).map(([catName, q]) => `${q}x ${catName}`);
+    let breakdownText = breakdownArr.length ? breakdownArr.join(' · ') : 'Standard Dulang';
+
+    let itemsHtml = bookings.map((b, idx) => {
+      let cust = dbCache.customers.find(c => c.id === b.customerId);
+      
+      let trayDetails = [];
+      let bCount = 0;
+      if (b.categoryCounts) {
+        Object.entries(b.categoryCounts).forEach(([catId, qty]) => {
+          let cat = dbCache.categories.find(c => c.id === catId);
+          if (cat && Number(qty) > 0) {
+            trayDetails.push(`<b>${qty}x</b> ${escapeHTML(cat.name)}`);
+            bCount += Number(qty);
+          }
+        });
+      }
+      let traySummaryText = trayDetails.length ? trayDetails.join(' · ') : (b.items || 'Standard Dulang');
+      if (bCount === 0 && !b.categoryCounts) bCount = 7;
+
+      return `
+        <div style="padding:${idx > 0 ? '14px 0 0' : '0 0 14px'}; ${idx < bookings.length - 1 ? 'border-bottom:1px dashed var(--line);' : ''}">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+            <div>
+              <b style="font-size:14px;color:var(--ink)">${idx + 1}. Ref: ${escapeHTML(b.ref)} · Pelanggan: ${escapeHTML(cust?.name || 'Pelanggan')}</b> 
+              <span class="small muted">(${escapeHTML(cust?.phone || '—')})</span>
+            </div>
+            <span class="pill pink" style="font-size:11px">${bCount} Dulang</span>
+          </div>
+          <div style="font-size:13px;margin-bottom:4px;">
+            <b>Jenis & Kuantiti Dulang:</b> ${traySummaryText}
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">
+            <b>Design / Theme:</b> ${escapeHTML(b.items || 'Tiada spesifikasi design khusus')}
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="small">Status: ${statusPill(b.status)} · Serahan Barang: <b>${formatDayDate(b.deliveryStartDate || b.deliveryDate)}</b></span>
+            <button class="btn soft" style="padding:4px 10px;font-size:11px;" onclick="openBooking('${b.id}')">Urus Tempahan Ini</button>
+          </div>
+        </div>`;
+    }).join('');
+
+    let altClass = `alt-bg-${groupIndex % 2}`;
+
+    html += `
+      <div class="week-card ${altClass}">
+        <div class="week-card-header">
+          <div>
+            <h4>📅 Minggu Majlis: ${dateStr}</h4>
+            <span class="small muted">Jumlah <b>${bookings.length} tempahan</b> pada minggu ini</span>
+          </div>
+          <div class="tray-badge-pill">
+            TOTAL: ${grandTotalTrays} Unit Dulang
+            <span class="tray-badge-breakdown">(${escapeHTML(breakdownText)})</span>
+          </div>
+        </div>
+        <div>
+          ${itemsHtml}
+        </div>
+      </div>`;
+    
+    groupIndex++;
+  });
+
+  container.innerHTML = html;
+}
+
+function renderBookings() {
+  const q = ($('bookingSearch')?.value || '').toLowerCase();
+  const f = $('bookingFilter')?.value || '';
+  const arr = dbCache.bookings.filter(b => (!f || b.status === f) && (`${b.ref} ${customerName(b.customerId)} ${dbCache.customers.find(c => c.id === b.customerId)?.phone || ''}`).toLowerCase().includes(q)).sort((a, b) => (a.eventStart || a.eventDate || '').localeCompare(b.eventStart || b.eventDate || ''));
+  
+  $('bookingRows').innerHTML = arr.length ? arr.map(b => {
+    let dateStr = formatDayDate(b.eventStart || b.eventDate);
+    if (b.eventEnd && b.eventEnd !== (b.eventStart || b.eventDate)) dateStr += ` hingga ${formatDayDate(b.eventEnd)}`;
+    return `<tr><td><b>${escapeHTML(b.ref)}</b></td><td>${escapeHTML(customerName(b.customerId))}</td><td>${escapeHTML(dbCache.customers.find(c => c.id === b.customerId)?.phone || '—')}</td><td>${dateStr}</td><td>${money(b.total)}</td><td>${money(bookingBalance(b))}</td><td>${statusPill(b.status)}</td><td><div class="btn-row"><button class="btn" onclick="openBooking('${b.id}')">Edit</button><button class="btn soft" onclick="printReceipt('${b.id}')">🖨 Resit</button></div></td></tr>`;
+  }).join('') : `<tr><td colspan="8" class="empty">Tiada rekod tempahan.</td></tr>`;
+}
+
+function renderCustomers() {
+  const q = ($('customerSearch')?.value || '').toLowerCase();
+  const arr = dbCache.customers.filter(c => (c.name + ' ' + c.phone + ' ' + (c.username || '')).toLowerCase().includes(q));
+  $('customerRows').innerHTML = arr.length ? arr.map(c => {
+    let bs = dbCache.bookings.filter(b => b.customerId === c.id);
+    return `<tr><td><b>${escapeHTML(c.name)}</b></td><td>${escapeHTML(c.phone)}</td><td>${escapeHTML(c.username ? '@' + c.username.replace('@','') : '—')}</td><td>${bs.length}</td><td>${money(bs.reduce((s, b) => s + Number(b.total || 0), 0))}</td><td>${escapeHTML(c.note || '—')}</td><td><button class="btn" onclick="openCustomer('${c.id}')">Edit</button></td></tr>`;
+  }).join('') : `<tr><td colspan="7" class="empty">Tiada pelanggan direkodkan.</td></tr>`;
+}
+
+function renderInventory() {
+  const q = ($('itemSearch')?.value || '').toLowerCase();
+  $('categoryCards').innerHTML = dbCache.categories.length ? dbCache.categories.map(c => {
+    let items = dbCache.items.filter(i => i.categoryId === c.id);
+    let totalStock = items.length;
+    let avail = items.filter(i => i.status === 'Available' || i.status === 'Returned').length;
+    return `<div class="item-card"><h4>${escapeHTML(c.name)}</h4><p>Total Fizikal: <b>${totalStock} Unit</b> · Available: <b>${avail}</b></p><div class="bar"><span style="width:${totalStock ? (avail / totalStock * 100) : 0}%"></span></div></div>`;
+  }).join('') : `<div class="empty">Belum ada kategori.</div>`;
+  
+  const arr = dbCache.items.filter(i => (i.code + ' ' + (dbCache.categories.find(c => c.id === i.categoryId)?.name || '') + ' ' + i.description).toLowerCase().includes(q));
+  $('itemRows').innerHTML = arr.length ? arr.map(i => `<tr><td><b>${escapeHTML(i.code)}</b></td><td>${escapeHTML(dbCache.categories.find(c => c.id === i.categoryId)?.name || '—')}</td><td>${escapeHTML(i.description || '—')}</td><td>${statusPill(i.status)}</td><td><button class="btn" onclick="openItem('${i.id}')">Edit</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">Tiada item.</td></tr>`;
+}
+
+function renderPayments() {
+  const q = ($('paymentSearch')?.value || '').toLowerCase();
+  const arr = [...dbCache.payments].filter(p => { let b = dbCache.bookings.find(x => x.id === p.bookingId); return (`${b?.ref || ''} ${customerName(b?.customerId)} ${p.method}`).toLowerCase().includes(q); }).sort((a, b) => b.date.localeCompare(a.date));
+  $('paymentRows').innerHTML = arr.length ? arr.map(p => {
+    let b = dbCache.bookings.find(x => x.id === p.bookingId);
+    return `<tr><td>${formatDayDate(p.date)}</td><td><b>${escapeHTML(b?.ref || '—')}</b></td><td>${escapeHTML(customerName(b?.customerId))}</td><td>${escapeHTML(p.method)}</td><td>${escapeHTML(p.type)}</td><td><b>${money(p.amount)}</b></td></tr>`;
+  }).join('') : `<tr><td colspan="6" class="empty">Belum ada transaksi.</td></tr>`;
+  const paid = dbCache.payments.reduce((s, p) => s + Number(p.amount), 0) + dbCache.bookings.reduce((s, b) => s + Number(b.deposit || 0), 0);
+  const due = dbCache.bookings.reduce((s, b) => s + bookingBalance(b), 0);
+  $('payReceived').textContent = money(paid); $('payOutstanding').textContent = money(due); $('payCount').textContent = dbCache.payments.length + dbCache.bookings.filter(b=>Number(b.deposit)>0).length;
+}
+
+function renderAppointments() {
+  const arr = [...dbCache.appointments].sort((a, b) => a.date.localeCompare(b.date));
+  $('appointmentRows').innerHTML = arr.length ? arr.map(a => `<tr><td><b>${formatDayDate(a.date)}</b></td><td>${timeFmt(a.time)}</td><td>${escapeHTML(a.name)}</td><td>${escapeHTML(a.phone)}</td><td>${escapeHTML(a.note || '—')}</td><td><button class="btn danger" onclick="deleteAppointment('${a.id}')">Padam</button></td></tr>`).join('') : `<tr><td colspan="6" class="empty">Tiada rekod temu janji Sabtu minggu pertama.</td></tr>`;
+}
+
+function renderStaff() {
+  $('staffRows').innerHTML = dbCache.staff.length ? dbCache.staff.map(s => `<tr><td><b>${escapeHTML(s.id)}</b></td><td>${escapeHTML(s.name)}</td><td>${escapeHTML(s.phone)}</td><td>${money(s.rate)} / jam</td><td><button class="btn danger" onclick="deleteStaff('${s.id}')">Hapus</button></td></tr>`).join('') : `<tr><td colspan="5" class="empty">Tiada kakitangan berdaftar.</td></tr>`;
+  
+  const arr = [...dbCache.attendance].sort((a, b) => b.date.localeCompare(a.date));
+  $('attendanceRows').innerHTML = arr.length ? arr.map(att => {
+    let st = dbCache.staff.find(s => s.id === att.staffId);
+    let hours = att.outTime ? Math.max(0, (new Date(`${att.date}T${att.outTime}`) - new Date(`${att.date}T${att.inTime}`)) / 3600000).toFixed(1) : 'Sedang Bertugas';
+    let pay = (hours !== 'Sedang Bertugas' && st) ? money(hours * st.rate) : '—';
+    let gpsLink = att.gps ? `<a href="https://maps.google.com/?q=${att.gps}" target="_blank" class="link-button">📍 ${att.gps}</a>` : '—';
+    return `<tr><td>${formatDayDate(att.date)}</td><td><b>${escapeHTML(st?.name || att.staffId)}</b></td><td>${timeFmt(att.inTime)}</td><td>${att.outTime ? timeFmt(att.outTime) : '—'}</td><td>${hours} jam</td><td><b>${pay}</b></td><td>${gpsLink}</td></tr>`;
+  }).join('') : `<tr><td colspan="7" class="empty">Tiada rekod kehadiran.</td></tr>`;
+}
+
+function renderReports() {
+  let total = dbCache.bookings.reduce((s, b) => s + Number(b.total || 0), 0);
+  let paid = dbCache.payments.reduce((s, p) => s + Number(p.amount), 0) + dbCache.bookings.reduce((s, b) => s + Number(b.deposit || 0), 0);
+  let due = dbCache.bookings.reduce((s, b) => s + bookingBalance(b), 0);
+  $('reportSales').textContent = money(total); $('reportPaid').textContent = money(paid);
+  $('reportDue').textContent = money(due); $('reportDone').textContent = dbCache.bookings.filter(b => b.status === 'Selesai').length;
+  
+  let categoryRevenue = {};
+  dbCache.categories.forEach(c => categoryRevenue[c.name] = 0);
+  dbCache.bookings.forEach(b => {
+    if(b.categoryCounts) {
+      Object.entries(b.categoryCounts).forEach(([catId, qty]) => {
+        let cat = dbCache.categories.find(c => c.id === catId);
+        if(cat && qty > 0) categoryRevenue[cat.name] += (qty * 30);
+      });
+    }
+  });
+  $('categoryRevenueReport').innerHTML = Object.entries(categoryRevenue).map(([catName, rev]) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f3ecef">
+      <span>${escapeHTML(catName)}</span><b>${money(rev)}</b>
+    </div>
+  `).join('');
+
+  const statuses = ['Baru', 'Disahkan', 'Sedang disewa', 'Selesai', 'Batal'];
+  $('statusReport').innerHTML = statuses.map(s => {
+    let n = dbCache.bookings.filter(b => b.status === s).length;
+    let pct = dbCache.bookings.length ? (n / dbCache.bookings.length * 100) : 0;
+    return `<div style="display:flex;align-items:center;gap:12px;margin:10px 0"><div style="width:120px;font-size:12px">${s}</div><div class="bar" style="flex:1;margin:0"><span style="width:${pct}%"></span></div><b style="width:24px;text-align:right">${n}</b></div>`;
+  }).join('');
+}
+
+function modal(title, body, saveLabel = 'Simpan', onSave = null) {
+  $('modalTitle').textContent = title; $('modalBody').innerHTML = body;
+  $('modalActions').innerHTML = `<button class="btn" onclick="closeModal()">Batal</button><button class="btn primary" id="modalSave">${saveLabel}</button>`;
+  $('modalBack').classList.add('show'); $('modalSave').onclick = onSave;
+}
+function closeModal() { $('modalBack').classList.remove('show'); }
+
+function openCustomer(id = null) {
+  let c = dbCache.customers.find(x => x.id === id);
+  modal(c ? 'Kemaskini pelanggan' : 'Pelanggan baharu', `
+    <div class="form-grid">
+      <div class="field"><label>Nama pelanggan *</label><input id="cName" value="${escapeHTML(c?.name || '')}"></div>
+      <div class="field"><label>Nombor telefon *</label><input id="cPhone" value="${escapeHTML(c?.phone || '')}" placeholder="Contoh: 0123456789"></div>
+      <div class="field full"><label>WhatsApp Username (Pilihan)</label><input id="cUsername" value="${escapeHTML(c?.username || '')}" placeholder="Contoh: amirah_hantaran (tanpa @)"></div>
+      <div class="field full"><label>Catatan</label><textarea id="cNote">${escapeHTML(c?.note || '')}</textarea></div>
+    </div>`, 'Simpan pelanggan', async () => {
+    let name = val('cName'), phone = val('cPhone').replace(/\s/g, ''), username = val('cUsername').replace('@','');
+    if (!name || !phone) return alert('Nama dan nombor telefon diperlukan.');
+    let custId = c ? c.id : 'CUS-' + Date.now();
+    await saveToCloud('customers', custId, { id: custId, name, phone, username, note: val('cNote') });
+    closeModal();
+  });
+}
+
+/* FUNGSI AUTO-KIRA TARIKH & MASA SERAHAN, PICKUP & RETURN */
+function calculateAutoDates() {
+  const startVal = val('bEventStart');
+  const endVal = val('bEventEnd') || startVal;
+  if (!startVal) return;
+
+  let startDate = new Date(startVal + 'T00:00:00');
+  let endDate = new Date(endVal + 'T00:00:00');
+
+  // 1. Tarikh Serahan Barangan (2 Minggu Sebelum Majlis: Isnin hingga Sabtu)
+  let delStart = new Date(startDate);
+  delStart.setDate(startDate.getDate() - 12); // Isnin 2 minggu sebelum
+  let delEnd = new Date(startDate);
+  delEnd.setDate(startDate.getDate() - 7);  // Sabtu 2 minggu sebelum
+
+  // 2. Tarikh Pickup (1 Hari Sebelum Majlis)
+  let pickupDate = new Date(startDate);
+  pickupDate.setDate(startDate.getDate() - 1);
+
+  // 3. Tarikh Pemulangan (Hari Isnin Pertama Selepas Majlis)
+  let returnDate = new Date(endDate);
+  let dayOfWeek = returnDate.getDay();
+  let daysUntilMonday = (dayOfWeek === 0) ? 1 : (8 - dayOfWeek); // Jika Ahad -> Isnin esoknya (+1)
+  returnDate.setDate(returnDate.getDate() + daysUntilMonday);
+
+  const formatISODate = d => d.toISOString().slice(0, 10);
+
+  // Set nilai automatik ke dalam petak borang
+  if (!$('bDeliveryStart').value) $('bDeliveryStart').value = formatISODate(delStart);
+  if (!$('bDeliveryEnd').value) $('bDeliveryEnd').value = formatISODate(delEnd);
+  if (!$('bDStart').value) $('bDStart').value = '10:00';
+  if (!$('bDEnd').value) $('bDEnd').value = '16:00';
+
+  if (!$('bPickup').value) $('bPickup').value = formatISODate(pickupDate);
+  if (!$('bPStart').value) $('bPStart').value = '10:30';
+  if (!$('bPEnd').value) $('bPEnd').value = '16:00';
+
+  if (!$('bReturn').value) $('bReturn').value = formatISODate(returnDate);
+  if (!$('bRStart').value) $('bRStart').value = '10:00';
+  if (!$('bREnd').value) $('bREnd').value = '17:00';
+}
+
+function openBooking(id = null) {
+  let b = dbCache.bookings.find(x => x.id === id);
+  const customerOptions = dbCache.customers.map(c => `<option value="${c.id}" ${b?.customerId === c.id ? 'selected' : ''}>${escapeHTML(c.name)} — ${escapeHTML(c.phone)}</option>`).join('');
+  const statusOptions = ['Baru', 'Disahkan', 'Sedang disewa', 'Selesai', 'Batal'].map(s => `<option ${b?.status === s ? 'selected' : ''}>${s}</option>`).join('');
+  const reminderOptions = ['Belum dihubungi', 'WhatsApp dihantar', 'Menunggu pengesahan', 'Selesai'].map(s => `<option ${b?.reminderStatus === s ? 'selected' : ''}>${s}</option>`).join('');
+  
+  let defaultRef = b?.ref || 'sewaipoh ' + (606 + dbCache.bookings.length);
+  let defaultDeposit = b?.deposit ?? 50;
+
+  let formHtml = `
+    ${b ? `<div class="btn-row" style="margin-bottom:14px"><button class="btn soft" onclick="closeModal();openReminder('${b.id}')">📱 Mesej WhatsApp</button><button class="btn soft" onclick="printReceipt('${b.id}')">🖨 Cetak Resit</button><button class="btn" onclick="closeModal();openPayment('${b.id}')">＋ Rekod Bayaran</button></div>
+           <div class="small muted" style="margin-bottom:12px">Deposit: ${money(b.deposit)} · Terpesan Lain: ${money(bookingPaid(b))} · Baki Semasa: <b>${money(bookingBalance(b))}</b></div>` : ``}
+    
+    <div class="notice">
+      <b>📌 AUTO-FILL OPERASI:</b> Tarikh & masa serahan barang, pickup & pemulangan akan diisi secara automatik sebaik sahaja anda memilih <b>Tarikh Majlis</b>.
+    </div>
+
+    <div class="form-grid">
+      <div class="field"><label>Nombor Rujukan *</label><input id="bRef" value="${escapeHTML(defaultRef)}"></div>
+      <div class="field"><label>Pelanggan *</label><select id="bCustomer"><option value="">Pilih pelanggan</option>${customerOptions}</select></div>
+      
+      <div class="field"><label>Tarikh Majlis Mula *</label><input type="date" id="bEventStart" value="${b?.eventStart || b?.eventDate || ''}" onchange="calculateAutoDates(); updateStockAvailabilityInfo('${b?.id || ''}');"></div>
+      <div class="field"><label>Tarikh Majlis Tamat *</label><input type="date" id="bEventEnd" value="${b?.eventEnd || b?.eventDate || ''}" onchange="calculateAutoDates(); updateStockAvailabilityInfo('${b?.id || ''}');"></div>
+      
+      <div class="field"><label>Status tempahan</label><select id="bStatus">${statusOptions}</select></div>
+      <div class="field"><label>Jumlah Harga Asal (RM) *</label><input type="number" min="0" step=".01" id="bTotal" value="${b?.total ?? ''}"></div>
+      
+      <div class="field"><label>Nilai Diskaun (RM)</label><input type="number" min="0" step=".01" id="bDiscount" value="${b?.discount ?? 0}"></div>
+      <div class="field"><label>Deposit / Lock Date (RM)</label><input type="number" min="0" step=".01" id="bDeposit" value="${defaultDeposit}"></div>
+      
+      <!-- JULAT TARIKH SERAHAN BARANGAN HANTARAN (AUTO: 2 MINGGU SEBELUM, ISNIN-SABTU) -->
+      <div class="field"><label>Tarikh Serahan Barangan (Dari) *</label><input type="date" id="bDeliveryStart" value="${b?.deliveryStartDate || b?.deliveryDate || ''}"></div>
+      <div class="field"><label>Tarikh Serahan Barangan (Hingga) *</label><input type="date" id="bDeliveryEnd" value="${b?.deliveryEndDate || b?.deliveryDate || ''}"></div>
+      <div class="field full"><label>Masa Serahan Barangan (Auto: 10:00 AM - 4:00 PM)</label><div class="time-range"><input type="time" id="bDStart" value="${b?.deliveryStart || '10:00'}"> <input type="time" id="bDEnd" value="${b?.deliveryEnd || '16:00'}"></div></div>
+      
+      <!-- PICKUP DULANG (AUTO: 1 HARI SEBELUM MAJLIS) -->
+      <div class="field"><label>Tarikh Pickup Dulang</label><input type="date" id="bPickup" value="${b?.pickupDate || ''}"></div>
+      <div class="field"><label>Masa Pickup (Auto: 10:30 AM - 4:00 PM)</label><div class="time-range"><input type="time" id="bPStart" value="${b?.pickupStart || '10:30'}"> <input type="time" id="bPEnd" value="${b?.pickupEnd || '16:00'}"></div></div>
+      
+      <!-- PEMULANGAN DULANG (AUTO: HARI ISNIN SELEPAS MAJLIS) -->
+      <div class="field"><label>Tarikh Pemulangan</label><input type="date" id="bReturn" value="${b?.returnDate || ''}"></div>
+      <div class="field"><label>Masa Pemulangan (Auto: 10:00 AM - 5:00 PM)</label><div class="time-range"><input type="time" id="bRStart" value="${b?.returnStart || '10:00'}"> <input type="time" id="bREnd" value="${b?.returnEnd || '17:00'}"></div></div>
+      
+      <div class="field full"><label>Catatan / Jenis Design (Cth: Cream Lily)</label><input id="bItems" value="${escapeHTML(b?.items || '')}"></div>
+      
+      <div class="field full">
+        <label>Kuantiti Tempahan Mengikut Kategori Dulang (Stok Bertapis Auto)</label>
+        <div class="checkbox-list" id="categoryStockContainer">
+          <div class="small muted">Sila pilih Tarikh Majlis Mula & Tamat di atas untuk melihat baki stok terkini.</div>
+        </div>
+      </div>
+
+      <div class="field full"><label>Lokasi majlis / alamat penghantaran</label><textarea id="bLocation">${escapeHTML(b?.location || '')}</textarea></div>
+      <div class="field full"><label>Status peringatan 14 hari</label><select id="bReminder">${reminderOptions}</select></div>
+    </div>`;
+
+  modal(b ? 'Butiran tempahan' : 'Tempahan baharu', formHtml, b ? 'Simpan perubahan' : 'Cipta tempahan', async () => {
+    let ref = val('bRef'), customerId = val('bCustomer'), eventStart = val('bEventStart'), eventEnd = val('bEventEnd'), total = Number(val('bTotal'));
+    if (!ref || !customerId || !eventStart || !eventEnd || !val('bTotal')) return alert('Sila lengkapkan rujukan, pelanggan, tarikh majlis dan jumlah harga.');
+    
+    let categoryCounts = {};
+    let isOverbooked = false;
+    let overbookMessage = '';
+
+    document.querySelectorAll('.cat-qty-input').forEach(el => {
+      let qty = Number(el.value || 0);
+      let maxAvailable = Number(el.getAttribute('max') || 999);
+      let catName = el.dataset.catname;
+
+      if (qty > maxAvailable) {
+        isOverbooked = true;
+        overbookMessage += `• ${catName}: Kuantiti diminta (${qty}) melebihi baki stok yang tinggal (${maxAvailable})!\n`;
+      }
+
+      if(qty > 0) categoryCounts[el.dataset.catid] = qty;
+    });
+
+    if (isOverbooked) {
+      return alert(`AMARAN STOK TAK CUKUP!\n\n${overbookMessage}\nSila kurangkan kuantiti dulang mengikut baki stok yang ada.`);
+    }
+
+    let bookingId = b ? b.id : 'BK-' + Date.now();
+    let data = {
+      id: bookingId, ref, customerId, eventStart, eventEnd, eventDate: eventStart, status: val('bStatus'), 
+      total, discount: Number(val('bDiscount')||0), deposit: Number(val('bDeposit')||0), items: val('bItems'), location: val('bLocation'), 
+      reminderStatus: val('bReminder'), categoryCounts,
+      deliveryStartDate: val('bDeliveryStart'),
+      deliveryEndDate: val('bDeliveryEnd'),
+      deliveryDate: val('bDeliveryStart'),
+      deliveryStart: val('bDStart'), deliveryEnd: val('bDEnd'),
+      pickupDate: val('bPickup'), pickupStart: val('bPStart'), pickupEnd: val('bPEnd'),
+      returnDate: val('bReturn'), returnStart: val('bRStart'), returnEnd: val('bREnd'),
+      createdAt: b?.createdAt || new Date().toISOString()
+    };
+    
+    await saveToCloud('bookings', bookingId, data);
+    closeModal();
+  });
+
+  setTimeout(() => updateStockAvailabilityInfo(id), 100);
+}
+
+function updateStockAvailabilityInfo(currentBookingId = null) {
+  const container = $('categoryStockContainer');
+  if(!container) return;
+
+  const eventStart = val('bEventStart');
+  const eventEnd = val('bEventEnd') || eventStart;
+  const b = currentBookingId ? dbCache.bookings.find(x => x.id === currentBookingId) : null;
+
+  if(!eventStart) {
+    container.innerHTML = `<div class="small muted">Sila pilih Tarikh Majlis Mula & Tamat di atas untuk melihat baki stok terkini.</div>`;
+    return;
+  }
+
+  let totalPhysicalStock = {};
+  dbCache.categories.forEach(c => {
+    let count = dbCache.items.filter(i => i.categoryId === c.id).length;
+    totalPhysicalStock[c.id] = count;
+  });
+
+  let bookedQuantities = {};
+  dbCache.categories.forEach(c => bookedQuantities[c.id] = 0);
+
+  dbCache.bookings.forEach(otherB => {
+    if (otherB.status !== 'Batal' && otherB.id !== currentBookingId) {
+      let oStart = otherB.eventStart || otherB.eventDate;
+      let oEnd = otherB.eventEnd || otherB.eventDate || oStart;
+
+      if (eventStart <= oEnd && eventEnd >= oStart) {
+        if (otherB.categoryCounts) {
+          Object.entries(otherB.categoryCounts).forEach(([catId, qty]) => {
+            bookedQuantities[catId] = (bookedQuantities[catId] || 0) + Number(qty || 0);
+          });
+        }
+      }
+    }
+  });
+
+  let html = dbCache.categories.map(c => {
+    let totalStock = totalPhysicalStock[c.id] || 0;
+    let bookedCount = bookedQuantities[c.id] || 0;
+    let availableLeft = Math.max(0, totalStock - bookedCount);
+    let currentQty = b?.categoryCounts?.[c.id] || 0;
+
+    let isOut = availableLeft === 0 && currentQty === 0;
+
+    return `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #f0e6e9;">
+        <div>
+          <span style="font-size:12px;font-weight:700;display:block">${escapeHTML(c.name)}</span>
+          <span class="small ${availableLeft < 5 ? 'muted' : ''}" style="color:${availableLeft === 0 ? 'var(--red)' : '#756970'}">
+            Total Stok: <b>${totalStock}</b> · Ditempah: <b>${bookedCount}</b> · Baki Tinggal: <b style="color:${availableLeft === 0 ? 'var(--red)' : 'var(--green)'}">${availableLeft} Unit</b>
+          </span>
+        </div>
+        <div>
+          <input type="number" min="0" max="${availableLeft + Number(currentQty)}" class="cat-qty-input" data-catid="${c.id}" data-catname="${escapeHTML(c.name)}" value="${currentQty}" ${isOut ? 'disabled' : ''} style="width:75px;padding:6px;text-align:center;font-weight:700;">
+        </div>
+      </div>`;
+  }).join('');
+
+  container.innerHTML = html;
+}
+
+function openReminder(id) {
+  let b = dbCache.bookings.find(x => x.id === id);
+  let c = dbCache.customers.find(x => x.id === b.customerId);
+  if (!b || !c) return;
+  
+  let phone = c.phone.replace(/\D/g, ''); if (phone.startsWith('0')) phone = '6' + phone;
+  const addr = dbCache.settings.businessAddress || '[Alamat premis SweettouchbyMJ di Taman Rapat Permai]';
+  
+  const fmtTime = (s, e) => (s || e) ? `(${timeFmt(s)} - ${timeFmt(e)})` : '';
+  
+  let delRange = 'Belum ditetapkan';
+  if (b.deliveryStartDate || b.deliveryDate) {
+    delRange = formatDayDate(b.deliveryStartDate || b.deliveryDate);
+    if (b.deliveryEndDate && b.deliveryEndDate !== (b.deliveryStartDate || b.deliveryDate)) {
+      delRange += ` hingga ${formatDayDate(b.deliveryEndDate)}`;
+    }
+    delRange += ` ${fmtTime(b.deliveryStart, b.deliveryEnd)}`;
+  }
+
+  const pStr = b.pickupDate ? `${formatDayDate(b.pickupDate)} ${fmtTime(b.pickupStart, b.pickupEnd)}` : 'Belum ditetapkan';
+  const rStr = b.returnDate ? `${formatDayDate(b.returnDate)} ${fmtTime(b.returnStart, b.returnEnd)}` : 'Belum ditetapkan';
+  
+  let dateRangeStr = formatDayDate(b.eventStart || b.eventDate);
+  if (b.eventEnd && b.eventEnd !== (b.eventStart || b.eventDate)) dateRangeStr += ` hingga ${formatDayDate(b.eventEnd)}`;
+
+  const msg = `Assalamualaikum 😊\n\nPihak SweettouchbyMJ ingin membuat pengesahan tempahan ${b.ref}.\n\n📅 Tarikh Majlis: ${dateRangeStr}\n\n📦 Serahan Barangan Hantaran untuk Digubah:\n• ${delRange}\n*(Nota: Sabtu hanya self drop. Hubungi admin sebelum membuat urusan pada hari sabtu. Cara masuk pagar akan dimaklumkan)*\n\n🧺 Pickup dulang: ${pStr}\n🔄 Pemulangan: ${rStr}\n\n📍 Lokasi Premis: ${addr}\n\n*Peringatan: SweettouchbyMJ bercuti setiap Sabtu, Ahad dan Cuti Umum. Waktu rehat: 12.30 PM – 2.00 PM.*\n\nBaki semasa perlu dijelaskan semasa pickup barang. Terima kasih! 🌸`;
+  
+  modal('Peringatan pelanggan · ' + b.ref, `
+    <div class="field"><label>Status tindakan</label><select id="remStatus">${['Belum dihubungi', 'WhatsApp dihantar', 'Menunggu pengesahan', 'Selesai'].map(s => `<option ${b.reminderStatus === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+    <div class="field"><label>Draf mesej WhatsApp (Hari, Tarikh & Masa)</label><textarea id="remMessage" style="min-height:260px">${escapeHTML(msg)}</textarea></div>
+    <div class="btn-row"><button class="btn soft" onclick="copyReminder()">Salin mesej</button><button class="btn" onclick="openWhatsApp('${phone}')">Buka WhatsApp</button></div>
+  `, 'Simpan status', async () => { 
+    b.reminderStatus = val('remStatus'); 
+    await saveToCloud('bookings', b.id, b);
+    closeModal(); 
+  });
+  
+  window.copyReminder = () => { navigator.clipboard?.writeText($('remMessage').value).then(() => alert('Mesej disalin.')); };
+  window.openWhatsApp = (p) => { window.open(`https://wa.me/${p}?text=${encodeURIComponent($('remMessage').value)}`, '_blank'); };
+}
+
+function printReceipt(id) {
+  let b = dbCache.bookings.find(x => x.id === id);
+  let c = dbCache.customers.find(x => x.id === b.customerId);
+  let paidTotal = bookingPaid(b) + Number(b.deposit || 0);
+  let bal = bookingBalance(b);
+  
+  let html = `
+    <div style="padding:20px;font-family:sans-serif;max-width:600px;margin:auto;border:1px solid #ccc;border-radius:10px;">
+      <h2 style="color:var(--rose);margin:0">SWEETTOUCHBYMJ</h2>
+      <p style="font-size:12px;color:#666;margin:2px 0 16px">Sewa Hantaran Ipoh · Taman Rapat Permai, Ipoh</p>
+      <hr>
+      <table style="width:100%;font-size:12px;margin:12px 0">
+        <tr><td><b>No. Rujukan:</b> ${escapeHTML(b.ref)}</td><td><b>Tarikh:</b> ${today()}</td></tr>
+        <tr><td><b>Pelanggan:</b> ${escapeHTML(c?.name || '—')}</td><td><b>Telefon:</b> ${escapeHTML(c?.phone || '—')}</td></tr>
+        <tr><td colspan="2"><b>Tarikh Majlis:</b> ${formatDayDate(b.eventStart || b.eventDate)}</td></tr>
+      </table>
+      <hr>
+      <table style="width:100%;font-size:12px;margin:12px 0">
+        <thead><tr style="background:#f8e8ee"><th>Keterangan</th><th style="text-align:right">Jumlah</th></tr></thead>
+        <tbody>
+          <tr><td>Sewa Hantaran / Gubahan (${escapeHTML(b.items || 'Standard')})</td><td style="text-align:right">${money(b.total)}</td></tr>
+          <tr><td>Diskaun</td><td style="text-align:right">-${money(b.discount)}</td></tr>
+          <tr><td><b>Jumlah Bersih</b></td><td style="text-align:right"><b>${money(Number(b.total)-Number(b.discount||0))}</b></td></tr>
+          <tr><td>Jumlah Telah Dibayar (Deposit/Terimaan)</td><td style="text-align:right;color:green">${money(paidTotal)}</td></tr>
+          <tr style="font-size:14px"><td><b>BAKI PERLU DIJELASKAN</b></td><td style="text-align:right;color:red"><b>${money(bal)}</b></td></tr>
+        </tbody>
+      </table>
+      <hr>
+      <p style="font-size:11px;color:#777;text-align:center">Terima kasih kerana memilih SweettouchbyMJ! 🌸<br><i>Nota: SweettouchbyMJ bercuti setiap Sabtu, Ahad & Cuti Umum. Waktu rehat 12.30 PM – 2.00 PM.</i></p>
+    </div>
+  `;
+  $('printArea').innerHTML = html;
+  window.print();
+}
+
+function openAppointmentModal() {
+  modal('Rekod Temu Janji Walk-In (Sabtu Minggu 1)', `
+    <div class="notice">Pilih tarikh Hari Sabtu minggu pertama sahaja (Masa terhad: 9:00 AM – 2:00 PM).</div>
+    <div class="form-grid">
+      <div class="field"><label>Tarikh Sabtu (Minggu 1) *</label><input type="date" id="apDate"></div>
+      <div class="field"><label>Masa (9:00 AM - 2:00 PM) *</label><input type="time" id="apTime" min="09:00" max="14:00" value="10:00"></div>
+      <div class="field"><label>Nama Pelanggan *</label><input id="apName"></div>
+      <div class="field"><label>No. Telefon *</label><input id="apPhone"></div>
+      <div class="field full"><label>Catatan / Tujuan Walk-In</label><input id="apNote" placeholder="Contoh: Nak bincang tema gubahan"></div>
+    </div>
+  `, 'Simpan Slot', async () => {
+    let d = val('apDate'), time = val('apTime'), name = val('apName'), phone = val('apPhone');
+    if (!d || !time || !name || !phone) return alert('Sila lengkapkan tarikh, masa, nama dan nombor telefon.');
+    
+    let dt = new Date(d + 'T00:00:00');
+    if (dt.getDay() !== 6 || dt.getDate() > 7) return alert('AMARAN: Tarikh mesti dipilih pada Hari Sabtu MINGGU PERTAMA sahaja!');
+    
+    let apId = 'AP-' + Date.now();
+    await saveToCloud('appointments', apId, { id: apId, date: d, time, name, phone, note: val('apNote') });
+    closeModal();
+  });
+}
+async function deleteAppointment(id) { if(confirm('Padam slot temu janji ini?')) await window.FB.deleteDoc(window.FB.doc(window.FB.db, 'appointments', id)); }
+
+function openStaffModal() {
+  modal('Tambah Kakitangan Baharu', `
+    <div class="form-grid">
+      <div class="field"><label>ID Unik Pekerja *</label><input id="stId" placeholder="Contoh: STAF-01"></div>
+      <div class="field"><label>Nama Pekerja *</label><input id="stName"></div>
+      <div class="field"><label>No. Telefon</label><input id="stPhone"></div>
+      <div class="field"><label>Kadar Gaji Sejam (RM) *</label><input type="number" id="stRate" value="8.00"></div>
+    </div>
+  `, 'Simpan Staf', async () => {
+    let id = val('stId'), name = val('stName'), rate = Number(val('stRate'));
+    if (!id || !name || rate <= 0) return alert('Sila masukkan ID, Nama dan kadar gaji.');
+    await saveToCloud('staff', id, { id, name, phone: val('stPhone'), rate });
+    closeModal();
+  });
+}
+async function deleteStaff(id) { if(confirm('Hapus staf ini dari sistem?')) await window.FB.deleteDoc(window.FB.doc(window.FB.doc(window.FB.db, 'staff', id))); }
+
+function openClockInModal() {
+  modal('Clock-In / Clock-Out Kakitangan', `
+    <div class="form-grid">
+      <div class="field full"><label>Masukkan ID Unik Pekerja *</label><input id="clkId" placeholder="Contoh: STAF-01"></div>
+      <div class="field full"><label>Tindakan</label>
+        <select id="clkAction"><option value="IN">Clock-In (Masuk Bertugas)</option><option value="OUT">Clock-Out (Selesai Bertugas)</option></select>
+      </div>
+    </div>
+  `, 'Hantar Kehadiran', async () => {
+    let sId = val('clkId'), act = val('clkAction');
+    let st = dbCache.staff.find(x => x.id === sId);
+    if (!st) return alert('ID Unik Pekerja tidak wujud dalam pangkalan data.');
+
+    let coords = '';
+    if (navigator.geolocation) {
+      await new Promise(res => {
+        navigator.geolocation.getCurrentPosition(pos => {
+          coords = `${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`;
+          res();
+        }, () => res(), { timeout: 5000 });
+      });
+    }
+
+    let todayDate = today();
+    let timeNow = new Date().toTimeString().slice(0, 5);
+    let existing = dbCache.attendance.find(a => a.staffId === sId && a.date === todayDate);
+
+    if (act === 'IN') {
+      let attId = existing ? existing.id : 'ATT-' + Date.now();
+      await saveToCloud('attendance', attId, { id: attId, staffId: sId, date: todayDate, inTime: timeNow, outTime: existing?.outTime || '', gps: coords });
+      alert(`Clock-In Berjaya untuk ${st.name} jam ${timeFmt(timeNow)}`);
+    } else {
+      if (!existing) return alert('Tiada rekod Clock-In untuk hari ini.');
+      existing.outTime = timeNow;
+      await saveToCloud('attendance', existing.id, existing);
+      alert(`Clock-Out Berjaya meuntuk ${st.name} jam ${timeFmt(timeNow)}`);
+    }
+    closeModal();
+  });
+}
+
+function openQuickBookingLink() {
+  modal('🔗 Pautan Borang WhatsApp Client (Quick Booking)', `
+    <p class="small muted">Anda boleh buka borang ringkas luar aplikasi ini atau kongsi pautan ini kepada pelanggan lepas bayar deposit RM50.</p>
+    <div class="field"><label>Nama Pelanggan *</label><input id="qbName"></div>
+    <div class="field"><label>No. Telefon *</label><input id="qbPhone"></div>
+    <div class="field"><label>Tarikh Majlis *</label><input type="date" id="qbDate"></div>
+    <div class="field"><label>Catatan Barang / Dulang</label><input id="qbNotes" placeholder="Contoh: Dulang Rose Gold 7 unit"></div>
+  `, 'Simpan & Auto-Sync ke Sistem', async () => {
+    let name = val('qbName'), phone = val('qbPhone'), date = val('qbDate');
+    if (!name || !phone || !date) return alert('Nama, nombor telefon dan tarikh majlis diperlukan.');
+    
+    let custId = 'CUS-' + Date.now();
+    await saveToCloud('customers', custId, { id: custId, name, phone, note: 'Quick Booking WhatsApp' });
+    
+    let bkId = 'BK-' + Date.now();
+    let defaultRef = 'sewaipoh ' + (606 + dbCache.bookings.length);
+    await saveToCloud('bookings', bkId, {
+      id: bkId, ref: defaultRef, customerId: custId, eventStart: date, eventEnd: date, eventDate: date,
+      status: 'Baru', total: 200, discount: 0, deposit: 50, items: val('qbNotes'), reminderStatus: 'Belum dihubungi',
+      createdAt: new Date().toISOString()
+    });
+    alert('Rekod Quick Booking berjaya ditambah secara live!');
+    closeModal();
+  });
+}
+
+function openPayment(bookingId = null) {
+  let opts = dbCache.bookings.map(b => `<option value="${b.id}" ${bookingId === b.id ? 'selected' : ''}>${escapeHTML(b.ref)} — ${escapeHTML(customerName(b.customerId))} (baki ${money(bookingBalance(b))})</option>`).join('');
+  modal('Rekod bayaran', `
+    <div class="form-grid">
+      <div class="field full"><label>Tempahan *</label><select id="pBooking"><option value="">Pilih tempahan</option>${opts}</select></div>
+      <div class="field"><label>Tarikh bayaran</label><input type="date" id="pDate" value="${today()}"></div>
+      <div class="field"><label>Jumlah (RM) *</label><input type="number" id="pAmount" min=".01" step=".01" placeholder="Cth: Bayaran baki"></div>
+      <div class="field"><label>Jenis bayaran</label><select id="pType"><option>Bayaran Tambahan / Baki</option><option>Deposit Tambahan</option><option>Refund</option></select></div>
+      <div class="field"><label>Kaedah</label><select id="pMethod"><option>Transfer bank</option><option>Tunai</option><option>QR / DuitNow</option><option>Lain-lain</option></select></div>
+      <div class="field full"><label>Rujukan / catatan</label><input id="pNote"></div>
+    </div>`, 'Simpan bayaran', async () => {
+    let bId = val('pBooking'), amount = Number(val('pAmount'));
+    if (!bId || amount <= 0) return alert('Pilih tempahan dan masukkan jumlah bayaran.');
+    let payId = 'PAY-' + Date.now();
+    await saveToCloud('payments', payId, { id: payId, bookingId: bId, date: val('pDate'), amount, type: val('pType'), method: val('pMethod'), note: val('pNote') });
+    closeModal();
+  });
+}
+
+function openCategory() {
+  modal('Tambah kategori inventori', `<div class="field"><label>Nama kategori *</label><input id="catName" placeholder="Contoh: Dulang hantaran"></div>`, 'Tambah', async () => {
+    let n = val('catName'); if (!n) return alert('Masukkan nama kategori.');
+    let catId = 'CAT-' + Date.now();
+    await saveToCloud('categories', catId, { id: catId, name: n });
+    closeModal();
+  });
+}
+
+function openItem(id = null) {
+  if (!dbCache.categories.length) return alert('Tambah kategori dahulu.');
+  let i = id ? dbCache.items.find(x => x.id === id) : null;
+  let statusOpts = ['Available', 'Reserved', 'Rented', 'Returned', 'Maintenance'].map(s => `<option ${i?.status === s ? 'selected' : ''}>${s}</option>`).join('');
+  let catOpts = dbCache.categories.map(c => `<option value="${c.id}" ${i?.categoryId === c.id ? 'selected' : ''}>${escapeHTML(c.name)}</option>`).join('');
+  modal(i ? 'Kemaskini item ' + i.code : 'Tambah item / dulang', `
+    <div class="form-grid">
+      <div class="field"><label>ID item *</label><input id="iCode" value="${escapeHTML(i?.code || '')}"></div>
+      <div class="field"><label>Kategori</label><select id="iCat">${catOpts}</select></div>
+      <div class="field"><label>Nama / keterangan</label><input id="iDesc" value="${escapeHTML(i?.description || '')}"></div>
+      <div class="field"><label>Status fizikal semasa</label><select id="iStatus">${statusOpts}</select></div>
+    </div>`, 'Simpan', async () => {
+    let code = val('iCode'); if (!code) return alert('ID item diperlukan.');
+    let itemId = i ? i.id : 'IT-' + Date.now();
+    await saveToCloud('items', itemId, { id: itemId, code, categoryId: val('iCat'), description: val('iDesc'), status: val('iStatus') });
+    closeModal();
+  });
+}
+
+function loadSettings() {
+  $('catalogUrl').value = dbCache.settings.catalogUrl || ''; $('businessAddress').value = dbCache.settings.businessAddress || ''; $('catalogLink').href = dbCache.settings.catalogUrl || '#';
+}
+async function saveSettings() {
+  dbCache.settings.catalogUrl = val('catalogUrl'); dbCache.settings.businessAddress = val('businessAddress');
+  await saveToCloud('config', 'settings', dbCache.settings);
+  $('catalogLink').href = dbCache.settings.catalogUrl || '#'; alert('Tetapan disimpan.');
+}
+function backupData() {
+  let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(dbCache, null, 2)], { type: 'application/json' }));
+  a.download = 'sweettouchbymj-backup-' + today() + '.json'; a.click(); URL.revokeObjectURL(a.href);
+}
+function exportCSV() {
+  let rows = [['Rujukan', 'Pelanggan', 'Telefon', 'Majlis Mula', 'Majlis Tamat', 'Status', 'Jumlah', 'Diskaun', 'Deposit', 'Baki']];
+  dbCache.bookings.forEach(b => { let c = dbCache.customers.find(x => x.id === b.customerId) || {}; rows.push([b.ref, c.name, c.phone, b.eventStart || b.eventDate, b.eventEnd || b.eventDate, b.status, b.total, b.discount || 0, b.deposit || 0, bookingBalance(b)]); });
+  let a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\ufeff' + rows.map(r => r.map(x => '"' + String(x ?? '').replace(/"/g, '""') + '"').join(',')).join('\n')], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'laporan-tempahan-' + today() + '.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+$('todayLabel').textContent = new Date().toLocaleDateString('ms-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+</script>
+</body>
+</html>

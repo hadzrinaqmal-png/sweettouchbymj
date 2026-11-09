@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick Booking Admin | SweettouchbyMJ</title>
+<style>
+:root{--pink:#d98fa7;--pink2:#f8e8ee;--rose:#a95d78;--ink:#352b30;--muted:#82757b;--line:#eee3e7;--bg:#fbf8f9;--white:#fff;--shadow:0 8px 28px #5830440c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;width:min(520px,100%);box-shadow:var(--shadow)}
+.brand{text-align:center;margin-bottom:20px}
+.brand strong{display:block;letter-spacing:1.3px;font-size:20px;color:var(--rose)}
+.brand span{font-size:11px;color:var(--muted);letter-spacing:1.8px}
+.notice{background:#f8e8ee;border:1px solid #f2dce4;color:var(--rose);padding:12px 14px;border-radius:10px;font-size:12px;margin-bottom:18px;font-weight:600}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:11px;color:#766970;font-weight:700}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:14px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px #d98fa71c;outline:none}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px}
+.form-grid .full{grid-column:1/-1}
+.btn{width:100%;background:var(--rose);color:#fff;border:0;padding:12px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px}
+.btn:hover{background:#934e67}
+.success-msg{display:none;background:#e7f4ee;color:#287653;border:1px solid #c2e5d5;padding:16px;border-radius:12px;text-align:center;margin-top:15px}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3-SOE5IE7jPZqB8zA2BJW9En8W5waxgg",
+    authDomain: "sweettouchbymj.firebaseapp.com",
+    projectId: "sweettouchbymj",
+    storageBucket: "sweettouchbymj.firebasestorage.app",
+    messagingSenderId: "804551682739",
+    appId: "1:804551682739:web:de106cc44b9af0c8095ec6",
+    measurementId: "G-8PZS1HPL7K"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  let existingBookingsCount = 0;
+
+  async function initCount() {
+    try {
+      const snap = await getDocs(collection(db, "bookings"));
+      existingBookingsCount = snap.docs.length;
+      document.getElementById('qbRef').value = 'sewaipoh ' + (606 + existingBookingsCount);
+    } catch(e) {}
+  }
+  initCount();
+
+  window.submitQuickBooking = async function() {
+    const ref = document.getElementById('qbRef').value.trim();
+    const name = document.getElementById('qbName').value.trim();
+    const phone = document.getElementById('qbPhone').value.trim().replace(/\s/g, '');
+    const dateStart = document.getElementById('qbStart').value;
+    const dateEnd = document.getElementById('qbEnd').value || dateStart;
+    const total = Number(document.getElementById('qbTotal').value || 200);
+    const deposit = Number(document.getElementById('qbDeposit').value || 50);
+    const items = document.getElementById('qbNotes').value.trim();
+
+    if (!name || !phone || !dateStart) {
+      alert('Sila lengkapkan Nama, No. Telefon dan Tarikh Majlis Mula.');
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Menyimpan Tempahan...';
+
+    try {
+      let custId = 'CUS-' + Date.now();
+      await setDoc(doc(db, 'customers', custId), {
+        id: custId, name, phone, note: 'Quick Booking'
+      });
+
+      let bkId = 'BK-' + Date.now();
+      await setDoc(doc(db, 'bookings', bkId), {
+        id: bkId,
+        ref: ref || ('sewaipoh ' + (606 + existingBookingsCount)),
+        customerId: custId,
+        eventStart: dateStart,
+        eventEnd: dateEnd,
+        eventDate: dateStart,
+        status: 'Baru',
+        total: total,
+        discount: 0,
+        deposit: deposit,
+        items: items,
+        reminderStatus: 'Belum dihubungi',
+        createdAt: new Date().toISOString()
+      });
+
+      document.getElementById('formBox').style.display = 'none';
+      document.getElementById('successBox').style.display = 'block';
+    } catch (err) {
+      alert('Gagal menyimpan tempahan. Sila cuba lagi.');
+      btn.disabled = false;
+      btn.textContent = 'Simpan Tempahan Ke Cloud';
+    }
+  };
+
+  window.resetForm = function() {
+    document.getElementById('formBox').style.display = 'block';
+    document.getElementById('successBox').style.display = 'none';
+    document.getElementById('qbName').value = '';
+    document.getElementById('qbPhone').value = '';
+    document.getElementById('qbStart').value = '';
+    document.getElementById('qbEnd').value = '';
+    document.getElementById('qbNotes').value = '';
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = false;
+    btn.textContent = 'Simpan Tempahan Ke Cloud';
+    initCount();
+  };
+</script>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <strong>SWEETTOUCHBYMJ</strong>
+    <span>QUICK BOOKING (ADMIN SHORTCUT)</span>
+  </div>
+
+  <div class="notice">
+    ⚡ <b>LALUAN PANTAS ADMIN:</b> Borang ini untuk key-in tempahan terus ke Cloud Firestore tanpa perlu log masuk.
+  </div>
+
+  <div id="formBox">
+    <div class="form-grid">
+      <div class="field full">
+        <label>No. Rujukan Auto</label>
+        <input type="text" id="qbRef" placeholder="sewaipoh 606...">
+      </div>
+      <div class="field full">
+        <label>Nama Pelanggan *</label>
+        <input type="text" id="qbName" placeholder="Contoh: Siti Aishah">
+      </div>
+      <div class="field full">
+        <label>No. Telefon (WhatsApp) *</label>
+        <input type="tel" id="qbPhone" placeholder="Contoh: 0123456789">
+      </div>
+      <div class="field">
+        <label>Majlis Mula *</label>
+        <input type="date" id="qbStart">
+      </div>
+      <div class="field">
+        <label>Majlis Tamat</label>
+        <input type="date" id="qbEnd">
+      </div>
+      <div class="field">
+        <label>Jumlah Harga (RM)</label>
+        <input type="number" id="qbTotal" value="200">
+      </div>
+      <div class="field">
+        <label>Deposit / Lock Date (RM)</label>
+        <input type="number" id="qbDeposit" value="50">
+      </div>
+      <div class="field full">
+        <label>Catatan Dulang / Design</label>
+        <textarea id="qbNotes" rows="2" placeholder="Contoh: 7 dulang Rose Gold Ukir (Theme Cream Lily)"></textarea>
+      </div>
+    </div>
+    <button class="btn" id="btnSubmit" onclick="submitQuickBooking()">Simpan Tempahan Ke Cloud</button>
+  </div>
+
+  <div class="success-msg" id="successBox">
+    <h3>Tempahan Berjaya Disimpan! 🌸</h3>
+    <p>Data telah dimasukkan terus ke dalam Cloud Firestore sistem utama.</p>
+    <button class="btn" style="margin-top:15px;background:#352b30;" onclick="resetForm()">＋ Tambah Tempahan Lagi</button>
+  </div>
+</div>
+
+</body>
+</html>

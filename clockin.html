@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kehadiran Staf | SweettouchbyMJ</title>
+<style>
+:root{--pink:#d98fa7;--pink2:#f8e8ee;--rose:#a95d78;--ink:#352b30;--muted:#82757b;--line:#eee3e7;--bg:#fbf8f9;--white:#fff;--shadow:0 8px 28px #5830440c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;width:min(450px,100%);box-shadow:var(--shadow)}
+.brand{text-align:center;margin-bottom:20px}
+.brand strong{display:block;letter-spacing:1.3px;font-size:20px;color:var(--rose)}
+.brand span{font-size:11px;color:var(--muted);letter-spacing:1.8px}
+.notice{background:#fff8e9;border:1px solid #f5e8c7;color:#85621d;padding:12px 14px;border-radius:10px;font-size:12px;margin-bottom:18px;line-height:1.5}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:11px;color:#766970;font-weight:700}
+.field input,.field select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:14px}
+.field input:focus,.field select:focus{border-color:var(--pink);box-shadow:0 0 0 3px #d98fa71c;outline:none}
+.btn{width:100%;background:var(--rose);color:#fff;border:0;padding:13px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px}
+.btn:hover{background:#934e67}
+.status-msg{display:none;padding:14px;border-radius:10px;text-align:center;margin-top:14px;font-weight:600;font-size:13px}
+.status-success{background:#e7f4ee;color:#287653;border:1px solid #c2e5d5}
+.status-error{background:#fbe9ec;color:#ad4354;border:1px solid #f2d9dd}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, getDocs, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3-SOE5IE7jPZqB8zA2BJW9En8W5waxgg",
+    authDomain: "sweettouchbymj.firebaseapp.com",
+    projectId: "sweettouchbymj",
+    storageBucket: "sweettouchbymj.firebasestorage.app",
+    messagingSenderId: "804551682739",
+    appId: "1:804551682739:web:de106cc44b9af0c8095ec6",
+    measurementId: "G-8PZS1HPL7K"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const todayStr = () => new Date().toISOString().slice(0, 10);
+  const timeNowStr = () => new Date().toTimeString().slice(0, 5);
+
+  window.submitAttendance = async function() {
+    const sId = document.getElementById('clkId').value.trim().toUpperCase();
+    const act = document.getElementById('clkAction').value;
+    const msgBox = document.getElementById('statusMsg');
+
+    if (!sId) {
+      alert('Sila masukkan ID Unik Pekerja anda.');
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Mengesahkan Lokasi & Masa...';
+
+    // 1. Semak jika ID Pekerja wujud dalam sistem
+    try {
+      const staffSnap = await getDocs(collection(db, "staff"));
+      const staffList = staffSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const st = staffList.find(s => s.id === sId);
+
+      if (!st) {
+        showMsg('ID Pekerja tidak wujud dalam pangkalan data admin.', false);
+        btn.disabled = false;
+        btn.textContent = 'Hantar Kehadiran';
+        return;
+      }
+
+      // 2. Dapatkan Lokasi GPS Telefon Staf
+      let coords = '';
+      if (navigator.geolocation) {
+        await new Promise(res => {
+          navigator.geolocation.getCurrentPosition(pos => {
+            coords = `${pos.coords.latitude.toFixed(5)},${pos.coords.longitude.toFixed(5)}`;
+            res();
+          }, () => res(), { timeout: 6000 });
+        });
+      }
+
+      // 3. Semak Rekod Kehadiran Hari Ini
+      const attSnap = await getDocs(collection(db, "attendance"));
+      const attList = attSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const existing = attList.find(a => a.staffId === sId && a.date === todayStr());
+
+      let todayDate = todayStr();
+      let timeNow = timeNowStr();
+
+      if (act === 'IN') {
+        let attId = existing ? existing.id : 'ATT-' + Date.now();
+        await setDoc(doc(db, 'attendance', attId), {
+          id: attId,
+          staffId: sId,
+          date: todayDate,
+          inTime: timeNow,
+          outTime: existing?.outTime || '',
+          gps: coords,
+          createdAt: new Date().toISOString()
+        });
+        showMsg(`✅ Clock-In BERJAYA untuk ${st.name} pada jam ${timeNow}.`, true);
+      } else {
+        if (!existing) {
+          showMsg(`❌ Rekod Clock-In tidak dijumpai untuk hari ini. Sila Clock-In dahulu!`, false);
+          btn.disabled = false;
+          btn.textContent = 'Hantar Kehadiran';
+          return;
+        }
+        existing.outTime = timeNow;
+        await setDoc(doc(db, 'attendance', existing.id), existing);
+        showMsg(`✅ Clock-Out BERJAYA untuk ${st.name} pada jam ${timeNow}. Terima kasih!`, true);
+      }
+
+      document.getElementById('clkId').value = '';
+    } catch (err) {
+      showMsg('Gagal menghantar kehadiran. Sila pastikan talian internet stabil.', false);
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Hantar Kehadiran';
+  };
+
+  function showMsg(txt, isSuccess) {
+    const el = document.getElementById('statusMsg');
+    el.textContent = txt;
+    el.className = 'status-msg ' + (isSuccess ? 'status-success' : 'status-error');
+    el.style.display = 'block';
+  }
+</script>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <strong>SWEETTOUCHBYMJ</strong>
+    <span>KEHADIRAN STAF (CLOCK-IN / OUT)</span>
+  </div>
+
+  <div class="notice">
+    📍 <b>PERINGATAN STAF:</b> Sila benarkan kebenaran Lokasi (GPS) pada telefon anda semasa menekan butang kehadiran.
+  </div>
+
+  <div class="field">
+    <label>Masukkan ID Unik Pekerja *</label>
+    <input type="text" id="clkId" placeholder="Contoh: STAF-01" style="text-transform:uppercase">
+  </div>
+
+  <div class="field">
+    <label>Pilih Tindakan *</label>
+    <select id="clkAction">
+      <option value="IN">Clock-In (Masuk Bertugas)</option>
+      <option value="OUT">Clock-Out (Balik / Selesai Bertugas)</option>
+    </select>
+  </div>
+
+  <button class="btn" id="btnSubmit" onclick="submitAttendance()">Hantar Kehadiran</button>
+
+  <div id="statusMsg" class="status-msg"></div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Temu Janji Walk-In | SweettouchbyMJ</title>
+<style>
+:root{--pink:#d98fa7;--pink2:#f8e8ee;--rose:#a95d78;--ink:#352b30;--muted:#82757b;--line:#eee3e7;--bg:#fbf8f9;--white:#fff;--shadow:0 8px 28px #5830440c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 Inter,system-ui,-apple-system,sans-serif;padding:20px;display:flex;justify-content:center;align-items:center;min-height:100vh}
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;width:min(480px,100%);box-shadow:var(--shadow)}
+.brand{text-align:center;margin-bottom:20px}
+.brand strong{display:block;letter-spacing:1.3px;font-size:20px;color:var(--rose)}
+.brand span{font-size:11px;color:var(--muted);letter-spacing:1.8px}
+.notice{background:#fff8e9;border:1px solid #f5e8c7;color:#85621d;padding:12px 14px;border-radius:10px;font-size:12px;margin-bottom:18px;line-height:1.6}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.field label{font-size:11px;color:#766970;font-weight:700}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:#fff;color:var(--ink);font-size:14px}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px #d98fa71c;outline:none}
+.btn{width:100%;background:var(--rose);color:#fff;border:0;padding:12px;border-radius:10px;font-weight:700;font-size:14px;cursor:pointer;margin-top:10px}
+.btn:hover{background:#934e67}
+.success-msg{display:none;background:#e7f4ee;color:#287653;border:1px solid #c2e5d5;padding:16px;border-radius:12px;text-align:center;margin-top:15px}
+</style>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore, collection, setDoc, doc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyB3-SOE5IE7jPZqB8zA2BJW9En8W5waxgg",
+    authDomain: "sweettouchbymj.firebaseapp.com",
+    projectId: "sweettouchbymj",
+    storageBucket: "sweettouchbymj.firebasestorage.app",
+    messagingSenderId: "804551682739",
+    appId: "1:804551682739:web:de106cc44b9af0c8095ec6",
+    measurementId: "G-8PZS1HPL7K"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.submitForm = async function() {
+    const name = document.getElementById('apName').value.trim();
+    const phone = document.getElementById('apPhone').value.trim();
+    const date = document.getElementById('apDate').value;
+    const time = document.getElementById('apTime').value;
+    const note = document.getElementById('apNote').value.trim();
+
+    if (!name || !phone || !date || !time) {
+      alert('Sila lengkapkan nama, nombor telefon, tarikh dan masa slot.');
+      return;
+    }
+
+    // Semakan Peraturan Sabtu Minggu Pertama
+    let dt = new Date(date + 'T00:00:00');
+    if (dt.getDay() !== 6 || dt.getDate() > 7) {
+      alert('AMARAN: Premis hanya menerima temu janji Walk-In pada Hari Sabtu MINGGU PERTAMA sahaja!');
+      return;
+    }
+
+    const btn = document.getElementById('btnSubmit');
+    btn.disabled = true;
+    btn.textContent = 'Menghantar...';
+
+    try {
+      let apId = 'AP-' + Date.now();
+      await setDoc(doc(db, 'appointments', apId), {
+        id: apId, name, phone, date, time, note,
+        createdAt: new Date().toISOString()
+      });
+
+      document.getElementById('formBox').style.display = 'none';
+      document.getElementById('successBox').style.display = 'block';
+    } catch (err) {
+      alert('Gagal menghantar slot. Sila cuba lagi.');
+      btn.disabled = false;
+      btn.textContent = 'Hantar Tempahan Slot Walk-In';
+    }
+  };
+</script>
+</head>
+<body>
+
+<div class="card">
+  <div class="brand">
+    <strong>SWEETTOUCHBYMJ</strong>
+    <span>TEMU JANJI WALK-IN PREMIS</span>
+  </div>
+
+  <div class="notice">
+    <b>📌 SYARAT TEMU JANJI WALK-IN:</b><br>
+    • Masa dibuka: <b>9:00 AM – 2:00 PM</b> sahaja.<br>
+    • Slot perbincangan khas pada <b>Hari Sabtu MINGGU PERTAMA setiap bulan</b>.
+  </div>
+
+  <div id="formBox">
+    <div class="field">
+      <label>Nama Penuh *</label>
+      <input type="text" id="apName" placeholder="Contoh: Amirah Husna">
+    </div>
+    <div class="field">
+      <label>Nombor Telefon (WhatsApp) *</label>
+      <input type="tel" id="apPhone" placeholder="Contoh: 0123456789">
+    </div>
+    <div class="field">
+      <label>Pilih Tarikh Sabtu (Minggu Pertama Sahaja) *</label>
+      <input type="date" id="apDate">
+    </div>
+    <div class="field">
+      <label>Pilih Masa Slot (9:00 AM - 2:00 PM) *</label>
+      <input type="time" id="apTime" min="09:00" max="14:00" value="10:00">
+    </div>
+    <div class="field">
+      <label>Tujuan / Catatan Gubahan</label>
+      <textarea id="apNote" rows="3" placeholder="Contoh: Nak bincang tema gubahan 7 dulang Rose Gold"></textarea>
+    </div>
+    <button class="btn" id="btnSubmit" onclick="submitForm()">Hantar Tempahan Slot Walk-In</button>
+  </div>
+
+  <div class="success-msg" id="successBox">
+    <h3>Tempahan Slot Berjaya! 🌸</h3>
+    <p>Terima kasih <b><span id="displayName"></span></b>. Slot anda telah direkodkan dalam sistem SweettouchbyMJ.</p>
+    <p class="small" style="margin-top:10px">Sila hadir mengikut tarikh dan masa yang dipilih di premis Taman Rapat Permai, Ipoh.</p>
+  </div>
+</div>
+
+</body>
+</html>
